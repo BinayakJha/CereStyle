@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Container, Row, Col, Form, Button, Card, Alert, ListGroup } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -37,26 +40,44 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <h1>Upload your photo</h1>
-      <form onSubmit={handleUpload}>
-        <input type="file" onChange={handleFileChange} />
-        <button type="submit">Upload</button>
-      </form>
-      {message && <p>{message}</p>}
-      {products.length > 0 && (
-        <div>
-          <h2>Suggested Products:</h2>
-          <ul>
-            {products.map((product, index) => (
-              <li key={index}>{product}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
+    <Container className="mt-5">
+      <Row className="justify-content-center">
+        <Col md={8}>
+          <Card className="shadow-sm">
+            <Card.Body>
+              <Card.Title className="text-center mb-4">Upload Your Photo</Card.Title>
+              <Form onSubmit={handleUpload}>
+                <Form.Group controlId="formFile" className="mb-3">
+                  <Form.Label>Select a photo to upload</Form.Label>
+                  <Form.Control type="file" onChange={handleFileChange} />
+                </Form.Group>
+                <Button variant="primary" type="submit" className="w-100">
+                  Upload
+                </Button>
+              </Form>
+
+              {message && (
+                <Alert variant="info" className="mt-4">
+                  {message}
+                </Alert>
+              )}
+
+              {products.length > 0 && (
+                <Card className="mt-4">
+                  <Card.Header>Suggested Products</Card.Header>
+                  <ListGroup variant="flush">
+                    {products.map((product, index) => (
+                      <ListGroup.Item key={index}>{product}</ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                </Card>
+              )}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 }
-
 
 export default App;
