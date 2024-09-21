@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Container, Row, Col, Form, Button, Card, ListGroup, Spinner, Alert, Navbar, Nav, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Card, ListGroup, Spinner, Alert, Modal, Navbar, Nav } from 'react-bootstrap';
 import './App.css';
 
 function App() {
@@ -10,9 +10,16 @@ function App() {
   const [products, setProducts] = useState([]);
   const [skinTone, setSkinTone] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(''); // Error handling state
-  const [showGenderModal, setShowGenderModal] = useState(false); // Modal state
-  const [gender, setGender] = useState(null); // Store selected gender
+  const [error, setError] = useState('');
+  const [showGenderModal, setShowGenderModal] = useState(false);
+  const [gender, setGender] = useState(null);
+  const [showColorModal, setShowColorModal] = useState(false); // For color pop-up
+  const [selectedColor, setSelectedColor] = useState(''); // For selected color in pop-up
+
+  const [seasons] = useState(['Summer', 'Winter']); // Placeholder seasons
+  const [colors] = useState(['#FF5733', '#33FF57', '#3357FF']); // Placeholder colors
+
+  const PEXELS_API_KEY = 'pGWgqahVrcprpx2XmPB4K8lrs9onLLjwBYRdusShqrglMavLjNpYtEIH';
 
   // Handle file selection and preview
   const handleFileChange = (e) => {
@@ -29,13 +36,12 @@ function App() {
   };
 
   // Handle file upload and receive product suggestions
-  const handleUpload = async (e) => {
+  const handleUpload = (e) => {
     e.preventDefault();
     if (!selectedFile) {
-      setMessage("Please select a file first.");
+      setMessage('Please select a file first.');
       return;
     }
-
     setShowGenderModal(true); // Show the gender selection modal after upload
   };
 
@@ -58,15 +64,47 @@ function App() {
       if (response.data.message && response.data.skinTone) {
         setMessage(response.data.message);
         setSkinTone(response.data.skinTone); // Set skin tone color
+        fetchOutfitSuggestions(response.data.skinTone, selectedGender); // Fetch outfits based on the skin tone and gender
       } else {
-        throw new Error("Unexpected response format from the server");
+        throw new Error('Unexpected response format from the server');
       }
     } catch (error) {
-      console.error("There was an error uploading the file!", error);
-      setError("Error uploading file. Please try again.");
+      console.error('There was an error uploading the file!', error);
+      setError('Error uploading file. Please try again.');
     } finally {
       setLoading(false); // Hide loading spinner
     }
+  };
+
+  // Fetch outfit suggestions using Pexels API
+  const fetchOutfitSuggestions = async (color, selectedGender) => {
+    try {
+      const response = await axios.get('https://api.pexels.com/v1/search', {
+        headers: {
+          Authorization: PEXELS_API_KEY,
+        },
+        params: {
+          query: `${selectedGender} outfit ${color}`, // Search for outfits based on the detected skin tone and selected gender
+          per_page: 6, // Limit results to 6 images
+        },
+      });
+
+      const images = response.data.photos.map((photo) => ({
+        url: photo.src.medium,
+        alt: photo.alt,
+      }));
+
+      setProducts(images); // Set the images as the product suggestions
+    } catch (error) {
+      console.error('Error fetching outfit suggestions', error);
+      setError('Error fetching outfit suggestions. Please try again.');
+    }
+  };
+
+  // Handle color click for larger view
+  const handleColorClick = (color) => {
+    setSelectedColor(color);
+    setShowColorModal(true); // Show the modal with the selected color
   };
 
   return (
@@ -138,14 +176,37 @@ function App() {
                     className="skin-tone-display p-3"
                     style={{
                       backgroundColor: skinTone,
-                      borderRadius: "10px",
-                      height: "100px",
+                      borderRadius: '10px',
+                      height: '100px',
                     }}
                   >
                     {/* Display the skin tone color */}
                   </div>
                 )
               )}
+            </Card>
+
+            {/* Color Theory Card placed directly below the Skin Tone Card */}
+            <Card className="card shadow-sm p-4 mb-4 mt-3">
+              <h4 className="mb-3 text-center">Color Theory</h4>
+              <h5>Season Options</h5>
+              <ListGroup variant="flush">
+                {seasons.map((season, index) => (
+                  <ListGroup.Item key={index}>{season}</ListGroup.Item>
+                ))}
+              </ListGroup>
+
+              <h5 className="mt-4">Color Bar</h5>
+              <div className="d-flex justify-content-between mt-3">
+                {colors.map((color, index) => (
+                  <div
+                    key={index}
+                    className="color-bar"
+                    style={{ backgroundColor: color, width: '60px', height: '30px', cursor: 'pointer' }}
+                    onClick={() => handleColorClick(color)}
+                  ></div>
+                ))}
+              </div>
             </Card>
           </Col>
 
@@ -161,7 +222,9 @@ function App() {
                 products.length > 0 && (
                   <ListGroup variant="flush">
                     {products.map((product, index) => (
-                      <ListGroup.Item key={index}>{product}</ListGroup.Item>
+                      <ListGroup.Item key={index}>
+                        <img src={product.url} alt={product.alt} className="img-fluid" />
+                      </ListGroup.Item>
                     ))}
                   </ListGroup>
                 )
@@ -183,6 +246,18 @@ function App() {
           <Button variant="secondary" className="m-2" onClick={() => handleGenderSelect('female')}>
             Female
           </Button>
+        </Modal.Body>
+      </Modal>
+
+      {/* Color View Modal */}
+      <Modal show={showColorModal} onHide={() => setShowColorModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Color Preview</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center">
+          <div
+            style={{ backgroundColor: selectedColor, width: '100%', height: '200px', borderRadius: '10px' }}
+          ></div>
         </Modal.Body>
       </Modal>
     </div>
