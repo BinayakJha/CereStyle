@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Container, Row, Col, Form, Button, Card, ListGroup, Spinner, Alert } from 'react-bootstrap';
-import './App.css'; // Assuming the above CSS is in App.css
+import { Container, Row, Col, Form, Button, Card, ListGroup, Spinner, Alert, Navbar, Nav, Modal } from 'react-bootstrap';
+import './App.css';
 
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -10,12 +10,22 @@ function App() {
   const [products, setProducts] = useState([]);
   const [skinTone, setSkinTone] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(''); // Error handling state
+  const [showGenderModal, setShowGenderModal] = useState(false); // Modal state
+  const [gender, setGender] = useState(null); // Store selected gender
 
   // Handle file selection and preview
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setSelectedFile(file);
     setImagePreview(URL.createObjectURL(file));
+  };
+
+  // Handle gender selection
+  const handleGenderSelect = (selectedGender) => {
+    setGender(selectedGender);
+    setShowGenderModal(false); // Close the modal after selection
+    processImage(selectedFile, selectedGender); // Call the function to process the image after gender is selected
   };
 
   // Handle file upload and receive product suggestions
@@ -26,10 +36,17 @@ function App() {
       return;
     }
 
+    setShowGenderModal(true); // Show the gender selection modal after upload
+  };
+
+  // Process image after gender selection
+  const processImage = async (file, selectedGender) => {
     const formData = new FormData();
-    formData.append('file', selectedFile);
+    formData.append('file', file);
+    formData.append('gender', selectedGender); // Send gender as part of the request
 
     setLoading(true); // Show loading spinner
+    setError(''); // Reset error state
 
     try {
       const response = await axios.post('http://127.0.0.1:8000/upload', formData, {
@@ -37,19 +54,35 @@ function App() {
           'Content-Type': 'multipart/form-data',
         },
       });
-      setMessage(response.data.message);
-      setProducts(response.data.products);
-      setSkinTone(response.data.skinTone); // Assuming the backend returns skin tone
-      setLoading(false); // Hide loading spinner
+
+      if (response.data.message && response.data.skinTone) {
+        setMessage(response.data.message);
+        setSkinTone(response.data.skinTone); // Set skin tone color
+      } else {
+        throw new Error("Unexpected response format from the server");
+      }
     } catch (error) {
       console.error("There was an error uploading the file!", error);
-      setMessage("Error uploading file. Please try again.");
-      setLoading(false); // Hide loading spinner even on error
+      setError("Error uploading file. Please try again.");
+    } finally {
+      setLoading(false); // Hide loading spinner
     }
   };
 
   return (
-    <div style={{ backgroundColor: '#fff', minHeight: '100vh', padding: '2rem 0' }}> {/* Full white background */}
+    <div style={{ backgroundColor: '#fff', minHeight: '100vh', padding: '0rem 0' }}>
+      {/* Navbar with Left Logo and Right Links */}
+      <Navbar expand="lg" className="gradient-navbar mb-4 navbar-custom">
+        <Navbar.Brand href="#home" className="navbar-brand-custom"></Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
+          <Nav>
+            <Nav.Link href="#home"></Nav.Link>
+            <Nav.Link href="#about"></Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
+
       <Container className="container mt-5">
         <Row className="justify-content-center">
           {/* Main Form and Image Preview */}
@@ -81,6 +114,13 @@ function App() {
                   {message}
                 </Alert>
               )}
+
+              {/* Display any error message */}
+              {error && (
+                <Alert variant="danger" className="mt-3">
+                  {error}
+                </Alert>
+              )}
             </Card>
           </Col>
 
@@ -94,7 +134,16 @@ function App() {
                 </div>
               ) : (
                 skinTone && (
-                  <div className="skin-tone-display p-3" style={{ backgroundColor: skinTone }}></div>
+                  <div
+                    className="skin-tone-display p-3"
+                    style={{
+                      backgroundColor: skinTone,
+                      borderRadius: "10px",
+                      height: "100px",
+                    }}
+                  >
+                    {/* Display the skin tone color */}
+                  </div>
                 )
               )}
             </Card>
@@ -121,6 +170,21 @@ function App() {
           </Col>
         </Row>
       </Container>
+
+      {/* Gender Selection Modal */}
+      <Modal show={showGenderModal} onHide={() => setShowGenderModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Select Your Gender</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center">
+          <Button variant="primary" className="m-2" onClick={() => handleGenderSelect('male')}>
+            Male
+          </Button>
+          <Button variant="secondary" className="m-2" onClick={() => handleGenderSelect('female')}>
+            Female
+          </Button>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }

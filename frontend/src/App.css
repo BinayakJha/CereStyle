@@ -25,6 +25,36 @@ h2, h4 {
   margin-bottom: 10px;
 }
 
+/* Custom sliding animation for the navbar */
+/* Gradient background for the navbar */
+.gradient-navbar {
+  background: linear-gradient(135deg, #537895, #537895); /* Eternal Constance gradient */
+}
+
+/* Align the Navbar.Brand to the left and Nav items to the right */
+.navbar-custom {
+  padding: 15px 20px; /* Padding between text and navbar */
+}
+
+.navbar-brand-custom {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white; /* Make the Navbar.Brand text white */
+}
+
+.navbar-collapse {
+  justify-content: flex-end; /* Align navbar links to the right */
+}
+
+.navbar-nav .nav-link {
+  color: white; /* Make the navbar links white */
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #ffebcd; /* Add hover effect for the links (optional) */
+}
 /* Card styles with glassmorphism */
 .card {
   background: rgba(255, 255, 255, 0.15); /* Slightly transparent white for glass effect */
