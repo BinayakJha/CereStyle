@@ -49,7 +49,7 @@ function App() {
   };
 
   return (
-    <div style={{ backgroundColor: '#fff5f5', minHeight: '100vh', padding: '2rem 0' }}> {/* Full white background */}
+    <div style={{ backgroundColor: '#fff', minHeight: '100vh', padding: '2rem 0' }}> {/* Full white background */}
       <Container className="container mt-5">
         <Row className="justify-content-center">
           {/* Main Form and Image Preview */}
