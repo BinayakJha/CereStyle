@@ -1,3 +1,90 @@
+/* Importing Manrope font */
+@import url('https://fonts.googleapis.com/css?family=Manrope:200,300,400,500,600,700,800&display=swap');
+
+/* Body and Global styles */
+body {
+  font-family: Manrope, sans-serif;
+  font-size: 20px;
+  line-height: 1.5em;
+  color: #161616; /* Dark text color */
+  background-color: #fff5f5; /* Full white background */
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.container {
+  margin: 8vh auto 3.2em;
+  width: 92%;
+}
+
+/* Custom heading styles */
+h2, h4 {
+  font-weight: 700;
+  color: rgba(22, 22, 22, 0.8); /* Darker color for headings */
+  margin-bottom: 10px;
+}
+
+/* Card styles with glassmorphism */
+.card {
+  background: rgba(255, 255, 255, 0.15); /* Slightly transparent white for glass effect */
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+  backdrop-filter: blur(10px); /* Blurred background for glass effect */
+  -webkit-backdrop-filter: blur(10px); /* For WebKit browsers */
+  border: 1px solid rgba(255, 255, 255, 0.3); /* Light border to enhance glass look */
+  color: #161616; /* Dark text inside cards */
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  background: linear-gradient(135deg, #09203F, #537895); /* Eternal Constance gradient on hover */
+  color: #fff; /* Light text color on hover */
+  transform: scale(1.05); /* Slight scale up on hover */
+}
+
+.card h2, .card h4, .card p, .card .btn-primary {
+  transition: color 0.3s ease; /* Transition for text color */
+}
+
+.card:hover h2, .card:hover h4, .card:hover p, .card:hover .btn-primary {
+  color: #fff; /* Ensure the text is readable against the gradient */
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: #09203F; /* Match the darker part of the gradient */
+  color: #fff;
+  border-radius: 12px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: #537895; /* Match the lighter part of the gradient */
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* Spinner styling */
+.spinner-border {
+  color: #161616; /* Dark spinner color */
+}
+
+/* Skin tone display */
+.skin-tone-display {
+  border-radius: 10px;
+  background-color: #09203F; /* Use the darker part of the gradient */
+  border: 2px solid rgba(22, 22, 22, 0.6); /* Dark border */
+}
+
+/* ListGroup */
+.list-group-item {
+  background-color: transparent;
+  color: #161616;
+  border: none;
+}
+
+/* Color swatch */
 .color-swatch {
   width: 50px;
   height: 50px;
@@ -6,12 +93,14 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Outfit suggestions container */
 .outfit-suggestions {
   display: flex;
   justify-content: space-around;
   width: 100%;
 }
 
+/* Outfit image style */
 .outfit-img {
   width: 150px;
   height: 200px;
@@ -20,7 +109,77 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* Card image style */
 .card-img {
   width: 100%;
   border-radius: 8px;
+}
+
+/* Page and Pagination styles */
+.w-page-count {
+  width: 100%;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.page-number {
+  margin-top: 0;
+  align-self: center;
+  font-size: 1.4em;
+  line-height: 1em;
+}
+
+.w-pagination-next {
+  display: block;
+  color: #333;
+  font-size: 14px;
+  margin-left: 10px;
+  margin-right: 10px;
+  padding: 9px 20px;
+  background-color: #fafafa;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+}
+
+.next {
+  margin-right: 0;
+  margin-left: 0;
+  padding: .4em .6em .4em .8em;
+  border-radius: 12px;
+  background-color: transparent;
+  transition: .2s ease-in-out;
+  color: #161616;
+  font-size: 1.6em;
+}
+
+.next:hover {
+  border-color: #161616;
+  background-color: #161616;
+  transform: scale(1.15);
+  color: #fff;
+}
+
+/* Image hover effect */
+.item-link:hover {
+  position: relative;
+  z-index: 9;
+  border: 1px transparent;
+  background-color: rgba(255, 247, 233, 0.04);
+  background-size: auto 100%;
+  background-repeat: no-repeat;
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+img {
+  border: 0;
+  max-width: 100%;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+.item-heading {
+  font-size: 2.4vw;
+  font-weight: 400;
+  letter-spacing: .01em;
 }

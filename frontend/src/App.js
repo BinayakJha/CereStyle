@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Container, Row, Col, Form, Button, Card, ListGroup, Spinner, Alert } from 'react-bootstrap';
+import './App.css'; // Assuming the above CSS is in App.css
 
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -48,12 +49,12 @@ function App() {
   };
 
   return (
-    <div style={{ backgroundColor: '#F9F9F9', minHeight: '100vh', padding: '2rem 0' }}>
-      <Container className="mt-5">
+    <div style={{ backgroundColor: '#fff5f5', minHeight: '100vh', padding: '2rem 0' }}> {/* Full white background */}
+      <Container className="container mt-5">
         <Row className="justify-content-center">
           {/* Main Form and Image Preview */}
           <Col md={6}>
-            <Card className="shadow-sm p-4 mb-4">
+            <Card className="card shadow-sm p-4 mb-4">
               <h2 className="text-center mb-4">Upload Your Photo</h2>
               <Form onSubmit={handleUpload}>
                 <Form.Group controlId="formFile" className="mb-3">
@@ -71,7 +72,7 @@ function App() {
 
               {imagePreview && (
                 <Card className="mb-3">
-                  <Card.Img variant="top" src={imagePreview} alt="Uploaded Preview" />
+                  <Card.Img variant="top" src={imagePreview} alt="Uploaded Preview" className="card-img" />
                 </Card>
               )}
 
@@ -85,7 +86,7 @@ function App() {
 
           {/* Side Column for Skin Tone */}
           <Col md={3}>
-            <Card className="shadow-sm p-4 mb-4">
+            <Card className="card shadow-sm p-4 mb-4">
               <h4 className="mb-3 text-center">Detected Skin Tone</h4>
               {loading ? (
                 <div className="d-flex justify-content-center">
@@ -93,9 +94,7 @@ function App() {
                 </div>
               ) : (
                 skinTone && (
-                  <div className="skin-tone-display p-3" style={{ backgroundColor: skinTone, borderRadius: '10px', height: '100px' }}>
-                    {/* Display the skin tone color */}
-                  </div>
+                  <div className="skin-tone-display p-3" style={{ backgroundColor: skinTone }}></div>
                 )
               )}
             </Card>
@@ -103,7 +102,7 @@ function App() {
 
           {/* Side Column for Product Recommendations */}
           <Col md={3}>
-            <Card className="shadow-sm p-4 mb-4">
+            <Card className="card shadow-sm p-4 mb-4">
               <h4 className="mb-3 text-center">Outfit Suggestions</h4>
               {loading ? (
                 <div className="d-flex justify-content-center">
