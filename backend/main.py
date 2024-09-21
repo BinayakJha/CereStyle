@@ -33,6 +33,47 @@ def save_uploaded_file(uploaded_file: UploadFile, folder: str):
         shutil.copyfileobj(uploaded_file.file, buffer)
     return file_path
 
+# Helper function to calculate the histogram similarity between two images
+def calculate_histogram_similarity(image1_path, image2_path):
+    image1 = cv2.imread(image1_path)
+    image2 = cv2.imread(image2_path)
+
+    # Convert images to HSV color space
+    hsv_image1 = cv2.cvtColor(image1, cv2.COLOR_BGR2HSV)
+    hsv_image2 = cv2.cvtColor(image2, cv2.COLOR_BGR2HSV)
+
+    # Calculate the histogram for each image
+    hist_image1 = cv2.calcHist([hsv_image1], [0, 1, 2], None, [50, 60, 50], [0, 180, 0, 256, 0, 256])
+    hist_image2 = cv2.calcHist([hsv_image2], [0, 1, 2], None, [50, 60, 50], [0, 180, 0, 256, 0, 256])
+
+    # Normalize the histograms
+    cv2.normalize(hist_image1, hist_image1, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+    cv2.normalize(hist_image2, hist_image2, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+
+    # Compare the histograms using correlation
+    similarity = cv2.compareHist(hist_image1, hist_image2, cv2.HISTCMP_CORREL)
+
+    return similarity
+
+# Define the find_closest_reference function
+def find_closest_reference(uploaded_image_path):
+    best_match = None
+    best_similarity = -1  # Start with a very low similarity score
+    
+    # Iterate over all reference images in the REFERENCE_FOLDER
+    for reference_image_name in os.listdir(REFERENCE_FOLDER):
+        reference_image_path = os.path.join(REFERENCE_FOLDER, reference_image_name)
+        
+        # Calculate the similarity between the uploaded image and the reference image
+        similarity = calculate_histogram_similarity(uploaded_image_path, reference_image_path)
+        
+        # If this image is a better match, update best_match and best_similarity
+        if similarity > best_similarity:
+            best_similarity = similarity
+            best_match = reference_image_name
+    
+    return best_match
+
 # Brightness adjustment using histogram equalization
 def adjust_brightness(eye_region):
     eye_gray = cv2.cvtColor(eye_region, cv2.COLOR_BGR2GRAY)
@@ -131,11 +172,18 @@ async def upload_and_suggest(file: UploadFile = File(...)):
     closest_reference = find_closest_reference(file_path)
 
     # Suggest products based on the closest reference
-    if closest_reference:
-        suggested_products = PRODUCTS.get(closest_reference, [])
-        return {"message": f"Closest match: {closest_reference}", "products": suggested_products}
-    else:
-        return {"message": "No match found"}
+    # suggested_products = PRODUCTS.get(closest_reference, [])
+
+    # Extract dominant skin tone color (reusing analyze_skin_tone logic)
+    face_colors, _ = extract_colors_from_face_and_eyes(file_path, num_clusters=5)
+    skin_tone_color = face_colors[np.argmax(face_colors.sum(axis=1))]
+    skin_tone_color = f"rgb({skin_tone_color[0]}, {skin_tone_color[1]}, {skin_tone_color[2]})"
+
+    return {
+        "message": f"Closest match: {closest_reference}",
+        "products": "Hello",
+        "skinTone": skin_tone_color
+    }
 
 # New API endpoint to get the path of an uploaded photo
 @app.get("/get_photo_path/{filename}")
