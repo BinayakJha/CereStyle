@@ -1,5 +1,10 @@
 
-# **CereStyle: Fashion with Confidence** ![Logo](./frontend/src/images/logo.png)
+# **CereStyle: Fashion with Confidence**
+
+
+<p align="center">
+  <img src="./frontend/src/images/logo.png" alt="Logo" width="200">
+</p>
 
 Welcome to **CereStyle**, an AI-powered fashion recommendation system that helps users discover outfits that enhance their natural features. By analyzing hair, skin, and eye color from uploaded photos, CereStyle compares these with reference images and suggests products worn by similar individuals. Whether you're looking for casual or professional attire, CereStyle offers personalized suggestions to help you feel confident in every setting.
 
