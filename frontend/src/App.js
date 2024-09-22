@@ -117,9 +117,9 @@ function App() {
   };
 
   return (
-    <div style={{ backgroundColor: '#edf2f9', minHeight: '100vh', padding: '2rem 2' }}>
+    <div style={{ backgroundColor: '#edf2f9', minHeight: '100vh', padding: '0rem 0rem' }}>
       {/* Navbar with Left Logo and Right Links */}
-      <Navbar expand="lg" className="gradient-navbar mb-4 navbar-custom">
+      <Navbar expand="lg" className="gradient-navbar mb-3 navbar-custom">
         <Navbar.Brand href="#home" className="navbar-brand-custom"></Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
@@ -141,13 +141,13 @@ function App() {
                   <Form.Label>Select a photo to upload</Form.Label>
                   <Form.Control type="file" onChange={handleFileChange} />
                 </Form.Group>
-                <Button backgroundcolor="#2c7be5" variant="primary" type="submit" className="w-100 mb-4">
-                  {loading ? (
-                    <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
-                  ) : (
-                    'Upload'
-                  )}
-                </Button>
+                <Button style={{ backgroundColor: '#222', color: '#fff' }} type="submit" className="w-100 mb-4">
+  {loading ? (
+    <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+  ) : (
+    'Upload'
+  )}
+</Button>
               </Form>
 
               {imagePreview && (

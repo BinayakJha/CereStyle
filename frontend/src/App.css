@@ -28,14 +28,16 @@ h2, h4 {
 /* Custom sliding animation for the navbar */
 /* Gradient background for the navbar */
 .gradient-navbar {
-  background: #7952b3;
+  background: #222;
   height: 2vw;
   width: 100%; /* Eternal Constance gradient */
 }
 
 /* Align the Navbar.Brand to the left and Nav items to the right */
 .navbar-custom {
-  padding: 15px 20px; /* Padding between text and navbar */
+  height: 50px; /* Adjust this value as needed */
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .navbar-brand-custom {
