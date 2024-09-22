@@ -12,6 +12,7 @@ import {
   Alert,
   Modal,
   Navbar,
+  Nav, // Added Nav for the Navbar links
 } from "react-bootstrap";
 import "./App.css";
 import logo from "./images/logo.png"; // Import your logo
@@ -30,6 +31,7 @@ function App() {
   const [showGenderModal, setShowGenderModal] = useState(false);
   const [showColorModal, setShowColorModal] = useState(false); // Modal for color preview
   const [selectedColor, setSelectedColor] = useState(""); // For selected color in the pop-up
+  const [showColorTheoryModal, setShowColorTheoryModal] = useState(false); // Modal for Color Theory
 
   const PEXELS_API_KEY =
     "pGWgqahVrcprpx2XmPB4K8lrs9onLLjwBYRdusShqrglMavLjNpYtEIH";
@@ -150,6 +152,10 @@ function App() {
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
+          <Nav>
+            {/* Navbar link to trigger the Color Theory modal */}
+            <Nav.Link onClick={() => setShowColorTheoryModal(true)}>About Color Theory</Nav.Link>
+          </Nav>
         </Navbar.Collapse>
       </Navbar>
 
@@ -340,6 +346,49 @@ function App() {
             }}
           ></div>
         </Modal.Body>
+      </Modal>
+
+      {/* Color Theory Modal */}
+      <Modal
+        show={showColorTheoryModal}
+        onHide={() => setShowColorTheoryModal(false)}
+        centered
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>About Color Theory</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <h4>What is Color Theory?</h4>
+          <p>
+            Color theory is a body of practical guidance to color mixing and
+            the visual effects of a specific color combination. Color theory
+            principles first appeared in the writings of Leone Battista Alberti
+            (c. 1435) and the notebooks of Leonardo da Vinci (c. 1490). A more
+            formalized representation of color theory concepts can be found in
+            Isaac Newton's color wheel (1704), which maps the relationships
+            between colors in a circle.
+          </p>
+          <p>
+            Understanding color theory helps you pair colors more effectively,
+            ensuring that your outfits or designs stand out while maintaining
+            harmony and visual appeal.
+          </p>
+          <h5>Primary Colors:</h5>
+          <p>Red, Blue, Yellow – these are the base colors that can be mixed to form any other color.</p>
+          <h5>Secondary Colors:</h5>
+          <p>Orange, Green, Purple – formed by mixing two primary colors.</p>
+          <h5>Complementary Colors:</h5>
+          <p>
+            Colors that sit opposite each other on the color wheel. They create
+            high contrast and vibrant looks.
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowColorTheoryModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
       </Modal>
     </div>
   );
