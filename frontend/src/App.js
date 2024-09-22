@@ -9,10 +9,16 @@ function App() {
   const [message, setMessage] = useState('');
   const [products, setProducts] = useState([]);
   const [skinTone, setSkinTone] = useState(null);
+  const [colorRecommendation, setColorRecommendation] = useState(''); // Added colorRecommendation
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showGenderModal, setShowGenderModal] = useState(false);
   const [gender, setGender] = useState(null);
+  const [showColorModal, setShowColorModal] = useState(false); // Added for color pop-up modal
+  const [selectedColor, setSelectedColor] = useState(''); // Added for selected color
+
+  const [seasons] = useState(['Summer', 'Winter']); // Placeholder seasons
+  const [colors] = useState(['#FF5733', '#33FF57', '#3357FF']); // Placeholder colors
 
   const PEXELS_API_KEY = 'pGWgqahVrcprpx2XmPB4K8lrs9onLLjwBYRdusShqrglMavLjNpYtEIH';
 
@@ -59,7 +65,8 @@ function App() {
       if (response.data.message && response.data.skinTone) {
         setMessage(response.data.message);
         setSkinTone(response.data.skinTone); // Set skin tone color
-        fetchOutfitSuggestions(response.data.skinTone, selectedGender); // Fetch outfits based on the skin tone and gender
+        setColorRecommendation(response.data.color_recommendation); // Set the color recommendation
+        fetchOutfitSuggestions(response.data.color_recommendation, selectedGender); // Fetch outfits based on the color recommendation and gender
       } else {
         throw new Error('Unexpected response format from the server');
       }
@@ -72,14 +79,14 @@ function App() {
   };
 
   // Fetch outfit suggestions using Pexels API
-  const fetchOutfitSuggestions = async (color, selectedGender) => {
+  const fetchOutfitSuggestions = async (colorRecommendation, selectedGender) => {
     try {
       const response = await axios.get('https://api.pexels.com/v1/search', {
         headers: {
           Authorization: PEXELS_API_KEY,
         },
         params: {
-          query: `${selectedGender} outfit ${color}`, // Search for outfits based on the detected skin tone and selected gender
+          query: `${selectedGender} outfit ${colorRecommendation}`, // Search for outfits based on the color recommendation and gender
           per_page: 6, // Limit results to 6 images
         },
       });
@@ -94,6 +101,12 @@ function App() {
       console.error('Error fetching outfit suggestions', error);
       setError('Error fetching outfit suggestions. Please try again.');
     }
+  };
+
+  // Handle color click for larger view
+  const handleColorClick = (color) => {
+    setSelectedColor(color);
+    setShowColorModal(true); // Show the modal with the selected color
   };
 
   return (
@@ -174,6 +187,29 @@ function App() {
                 )
               )}
             </Card>
+
+            {/* Color Theory Card placed directly below the Skin Tone Card */}
+            <Card className="card shadow-sm p-4 mb-4 mt-3">
+              <h4 className="mb-3 text-center">Color Theory</h4>
+              <h5>Season Options</h5>
+              <ListGroup variant="flush">
+                {seasons.map((season, index) => (
+                  <ListGroup.Item key={index}>{season}</ListGroup.Item>
+                ))}
+              </ListGroup>
+
+              <h5 className="mt-4">Color Bar</h5>
+              <div className="d-flex justify-content-between mt-3">
+                {colors.map((color, index) => (
+                  <div
+                    key={index}
+                    className="color-bar"
+                    style={{ backgroundColor: color, width: '60px', height: '30px', cursor: 'pointer' }}
+                    onClick={() => handleColorClick(color)}
+                  ></div>
+                ))}
+              </div>
+            </Card>
           </Col>
 
           {/* Side Column for Product Recommendations */}
@@ -212,6 +248,18 @@ function App() {
           <Button variant="secondary" className="m-2" onClick={() => handleGenderSelect('female')}>
             Female
           </Button>
+        </Modal.Body>
+      </Modal>
+
+      {/* Color View Modal */}
+      <Modal show={showColorModal} onHide={() => setShowColorModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Color Preview</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center">
+          <div
+            style={{ backgroundColor: selectedColor, width: '100%', height: '200px', borderRadius: '10px' }}
+          ></div>
         </Modal.Body>
       </Modal>
     </div>
