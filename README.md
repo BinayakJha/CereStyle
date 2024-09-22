@@ -21,6 +21,7 @@ This project is a fashion recommendation system where users upload photos, and t
 5. [Project Directory Structure](#project-directory-structure)
 6. [Key Commands](#4-key-commands)
 7. [Additional Tips](#5-additional-tips)
+8. [Contributors](#contributors)
 
 ---
 
@@ -179,36 +180,9 @@ project_root/
 
 ---
 
-This guide should help anyone get the project up and running smoothly. Let me know if you need additional clarifications!
+## **Developers**
 
---- 
+- **[maheessh](https://github.com/maheessh)**
+- **[BinayakJha](https://github.com/BinayakJha)**
+- **[sujalshah0444](https://github.com/sujalshah0444)**
 
-### **How to Add This README to GitHub:**
-
-1. Add this file (`README.md`) to the root of your project directory.
-2. If your project is not already on GitHub, follow these steps:
-   - Initialize a Git repository:
-     ```bash
-     git init
-     ```
-   - Add files and commit:
-     ```bash
-     git add .
-     git commit -m "Initial commit with README"
-     ```
-   - Push to GitHub:
-     ```bash
-     git remote add origin <your-repo-url>
-     git push -u origin master
-     ```
-
-3. If your project is already on GitHub, simply commit and push the `README.md` file:
-   ```bash
-   git add README.md
-   git commit -m "Add project README"
-   git push
-   ```
-
-This will display the `README.md` file on your project's GitHub page!
-
-Let me know if you need any further adjustments!

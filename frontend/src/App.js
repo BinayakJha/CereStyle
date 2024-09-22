@@ -109,6 +109,12 @@ function App() {
     setShowColorModal(true); // Show the modal with the selected color
   };
 
+  // Handle color click for larger view
+  const handleColorClick = (color) => {
+    setSelectedColor(color);
+    setShowColorModal(true); // Show the modal with the selected color
+  };
+
   return (
     <div style={{ backgroundColor: '#fff', minHeight: '100vh', padding: '0rem 0' }}>
       {/* Navbar with Left Logo and Right Links */}
@@ -248,6 +254,18 @@ function App() {
           <Button variant="secondary" className="m-2" onClick={() => handleGenderSelect('female')}>
             Female
           </Button>
+        </Modal.Body>
+      </Modal>
+
+      {/* Color View Modal */}
+      <Modal show={showColorModal} onHide={() => setShowColorModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Color Preview</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center">
+          <div
+            style={{ backgroundColor: selectedColor, width: '100%', height: '200px', borderRadius: '10px' }}
+          ></div>
         </Modal.Body>
       </Modal>
 
