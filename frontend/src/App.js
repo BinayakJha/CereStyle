@@ -107,8 +107,15 @@ function App() {
     setShowColorModal(true); // Show the modal with the selected color
   };
 
+  // Dummy color meanings for the colors
+  const colorMeanings = {
+    '#FF5733': 'Orange represents creativity and enthusiasm.',
+    '#33FF57': 'Green symbolizes growth, harmony, and freshness.',
+    '#3357FF': 'Blue conveys tranquility and stability.',
+  };
+
   return (
-    <div style={{ backgroundColor: '#fff', minHeight: '100vh', padding: '0rem 0' }}>
+    <div style={{ backgroundColor: '#edf2f9', minHeight: '100vh', padding: '2rem 2' }}>
       {/* Navbar with Left Logo and Right Links */}
       <Navbar expand="lg" className="gradient-navbar mb-4 navbar-custom">
         <Navbar.Brand href="#home" className="navbar-brand-custom"></Navbar.Brand>
@@ -132,7 +139,7 @@ function App() {
                   <Form.Label>Select a photo to upload</Form.Label>
                   <Form.Control type="file" onChange={handleFileChange} />
                 </Form.Group>
-                <Button variant="primary" type="submit" className="w-100 mb-4">
+                <Button backgroundcolor="#2c7be5" variant="primary" type="submit" className="w-100 mb-4">
                   {loading ? (
                     <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
                   ) : (
@@ -207,6 +214,18 @@ function App() {
                   ></div>
                 ))}
               </div>
+            </Card>
+
+            {/* Colors Meaning Card placed directly below the Color Theory Card */}
+            <Card className="card shadow-sm p-4 mb-4 mt-3">
+              <h4 className="mb-3 text-center">Colors Meaning</h4>
+              <ListGroup variant="flush">
+                {colors.map((color, index) => (
+                  <ListGroup.Item key={index} style={{ backgroundColor: color, color: '#fff' }}>
+                    {colorMeanings[color]}
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
             </Card>
           </Col>
 

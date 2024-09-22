@@ -28,7 +28,9 @@ h2, h4 {
 /* Custom sliding animation for the navbar */
 /* Gradient background for the navbar */
 .gradient-navbar {
-  background: linear-gradient(135deg, #537895, #537895); /* Eternal Constance gradient */
+  background: #7952b3;
+  height: 2vw;
+  width: 100%; /* Eternal Constance gradient */
 }
 
 /* Align the Navbar.Brand to the left and Nav items to the right */
@@ -52,34 +54,26 @@ h2, h4 {
   padding-right: 20px;
 }
 
-.navbar-nav .nav-link:hover {
-  color: #ffebcd; /* Add hover effect for the links (optional) */
-}
-/* Card styles with glassmorphism */
+
 .card {
-  background: rgba(255, 255, 255, 0.15); /* Slightly transparent white for glass effect */
+  background: rgba(255, 255, 255, 0.85); /* Soft white background */
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
-  backdrop-filter: blur(10px); /* Blurred background for glass effect */
-  -webkit-backdrop-filter: blur(10px); /* For WebKit browsers */
-  border: 1px solid rgba(255, 255, 255, 0.3); /* Light border to enhance glass look */
-  color: #161616; /* Dark text inside cards */
-  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), /* First shadow for subtle lift */
+              0 6px 20px rgba(0, 0, 0, 0.08); /* Second shadow for depth */
+  transition: transform 0.2s ease-in-out;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px); /* For Safari/Chrome */
+  padding: 20px;
 }
 
 .card:hover {
-  background: linear-gradient(135deg, #09203F, #537895); /* Eternal Constance gradient on hover */
-  color: #fff; /* Light text color on hover */
-  transform: scale(1.05); /* Slight scale up on hover */
+  transform: translateY(-5px); /* Slight upward movement on hover */
 }
 
 .card h2, .card h4, .card p, .card .btn-primary {
   transition: color 0.3s ease; /* Transition for text color */
 }
 
-.card:hover h2, .card:hover h4, .card:hover p, .card:hover .btn-primary {
-  color: #fff; /* Ensure the text is readable against the gradient */
-}
 
 /* Button styles */
 .btn-primary {
@@ -89,11 +83,6 @@ h2, h4 {
   transition: transform 0.2s ease-in-out;
 }
 
-.btn-primary:hover {
-  background-color: #537895; /* Match the lighter part of the gradient */
-  color: #fff;
-  transform: scale(1.05);
-}
 
 /* Spinner styling */
 .spinner-border {
