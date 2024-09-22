@@ -1,8 +1,8 @@
 import os
 import cv2
+import shutil
 import mediapipe as mp
 import numpy as np
-from sklearn.cluster import KMeans
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from cerebras.cloud.sdk import Cerebras
@@ -11,10 +11,10 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # Allow requests from React dev server
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allow all headers, including content-type
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Initialize Cerebras API client
@@ -26,9 +26,8 @@ client = Cerebras(
 UPLOAD_FOLDER = "uploads/"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Initialize Mediapipe Face Detection and Landmark Modules
-mp_face_detection = mp.solutions.face_detection
-mp_drawing = mp.solutions.drawing_utils
+# Initialize Mediapipe Face Mesh module
+mp_face_mesh = mp.solutions.face_mesh
 
 # Helper function to save the uploaded file
 def save_uploaded_file(uploaded_file: UploadFile, folder: str):
@@ -37,43 +36,56 @@ def save_uploaded_file(uploaded_file: UploadFile, folder: str):
         shutil.copyfileobj(uploaded_file.file, buffer)
     return file_path
 
-# Extract skin color using face landmarks from Mediapipe
-def extract_skin_color_mediapipe(image_path: str, num_clusters=5):
+# Extract skin color from chin and nose using Mediapipe Face Mesh
+def extract_chin_nose_skin_color(image_path: str):
     image = cv2.imread(image_path)
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    # Initialize Mediapipe Face Detection
-    with mp_face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.5) as face_detection:
-        results = face_detection.process(image_rgb)
+    # Initialize Mediapipe Face Mesh
+    with mp_face_mesh.FaceMesh(static_image_mode=True, max_num_faces=1, refine_landmarks=True) as face_mesh:
+        results = face_mesh.process(image_rgb)
 
-        if not results.detections:
+        if not results.multi_face_landmarks:
             raise HTTPException(status_code=400, detail="No face detected")
 
-        # Take the first detected face
-        detection = results.detections[0]
+        # Get the first detected face landmarks
+        face_landmarks = results.multi_face_landmarks[0]
 
-        # Get the bounding box of the face
-        bboxC = detection.location_data.relative_bounding_box
+        # Define landmarks for the chin and nose
+        chin_landmarks = [152, 377, 378, 379, 365]  # Chin points
+        nose_landmarks = [1, 2, 3, 4, 5]  # Nose points
+
+        chin_pixels = []
+        nose_pixels = []
+
         ih, iw, _ = image.shape
-        (x, y, w, h) = int(bboxC.xmin * iw), int(bboxC.ymin * ih), int(bboxC.width * iw), int(bboxC.height * ih)
 
-        # Extract the face region of interest (ROI)
-        face_roi = image_rgb[y:y+h, x:x+w]
+        # Collect pixels for chin landmarks
+        for landmark_idx in chin_landmarks:
+            x = int(face_landmarks.landmark[landmark_idx].x * iw)
+            y = int(face_landmarks.landmark[landmark_idx].y * ih)
+            chin_pixels.append(image_rgb[y, x])
 
-        # Reshape the face ROI to a 2D array of pixels (for K-Means clustering)
-        face_pixels = face_roi.reshape(-1, 3)
+        # Collect pixels for nose landmarks
+        for landmark_idx in nose_landmarks:
+            x = int(face_landmarks.landmark[landmark_idx].x * iw)
+            y = int(face_landmarks.landmark[landmark_idx].y * ih)
+            nose_pixels.append(image_rgb[y, x])
 
-        # Apply K-Means clustering to find the dominant skin color
-        kmeans = KMeans(n_clusters=num_clusters)
-        kmeans.fit(face_pixels)
-        dominant_color = kmeans.cluster_centers_.astype(int)
-        return dominant_color[0]
+        # Combine chin and nose pixels
+        all_pixels = np.array(chin_pixels + nose_pixels)
+
+        # Calculate the average skin tone color from these pixels
+        avg_color = np.mean(all_pixels, axis=0)
+        avg_color_int = tuple(map(int, avg_color))
+
+        return avg_color_int
 
 # Use Cerebras API to get season and color palette recommendation
 def get_color_recommendation(skin_tone_rgb):
     rgb_string = f"rgb({skin_tone_rgb[0]}, {skin_tone_rgb[1]}, {skin_tone_rgb[2]})"
-    
-    prompt = f"dont write code or any other explanation, just output the color recommendation. Given the RGB values of a person's skin tone ({rgb_string}), generate a season color (one word: autumn, summer, winter, spring) and three corresponding color codes (HEX) that best match their skin tone based on color theory. Output format should strictly only be: 'Season: <season> Colors: <color1>, <color2>, <color3>'."
+
+    prompt = f"dont write code or any other explanation, just output the color recommendation. Given the RGB values of a person's skin tone ({rgb_string}), generate a season color (one word: autumn, summer, winter, spring) and three corresponding color codes (HEX) that best match their skin tone based on color theory. Output format should strictly only be: 'Season: <season> Colors (at least 6): <color1>, <color2>, <color3>, <color4>, <color5>, <color6>'."
 
     chat_completion = client.chat.completions.create(
         messages=[{
@@ -91,8 +103,8 @@ async def upload_and_suggest(file: UploadFile = File(...)):
     file_path = save_uploaded_file(file, UPLOAD_FOLDER)
 
     try:
-        # Extract dominant skin tone color using Mediapipe
-        skin_tone_color = extract_skin_color_mediapipe(file_path)
+        # Extract skin tone color from chin and nose using Mediapipe
+        skin_tone_color = extract_chin_nose_skin_color(file_path)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 

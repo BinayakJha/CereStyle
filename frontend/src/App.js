@@ -17,53 +17,55 @@ import "./App.css";
 import logo from "./images/logo.png"; // Import your logo
 
 function App() {
+  // State hooks for managing app data
   const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [message, setMessage] = useState("");
   const [products, setProducts] = useState([]);
   const [skinTone, setSkinTone] = useState(null);
-  const [colorRecommendation, setColorRecommendation] = useState([]); // Updated to an array
+  const [colorRecommendation, setColorRecommendation] = useState([]); // Updated to handle multiple colors
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showGenderModal, setShowGenderModal] = useState(false);
   const [gender, setGender] = useState(null);
-  const [showColorModal, setShowColorModal] = useState(false); // For color pop-up modal
-  const [selectedColor, setSelectedColor] = useState(""); // For selected color in pop-up
+  const [showColorModal, setShowColorModal] = useState(false); // Modal for color preview
+  const [selectedColor, setSelectedColor] = useState(""); // For selected color in the pop-up
 
-  const PEXELS_API_KEY = "pGWgqahVrcprpx2XmPB4K8lrs9onLLjwBYRdusShqrglMavLjNpYtEIH";
+  const PEXELS_API_KEY =
+    "pGWgqahVrcprpx2XmPB4K8lrs9onLLjwBYRdusShqrglMavLjNpYtEIH";
 
-  // Handle file selection and preview
+  // Handle file selection and image preview
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setSelectedFile(file);
-    setImagePreview(URL.createObjectURL(file));
+    setImagePreview(URL.createObjectURL(file)); // Show image preview
   };
 
-  // Handle gender selection
+  // Handle gender selection from the modal
   const handleGenderSelect = (selectedGender) => {
     setGender(selectedGender);
-    setShowGenderModal(false); // Close the modal after selection
-    processImage(selectedFile, selectedGender); // Call the function to process the image after gender is selected
+    setShowGenderModal(false); // Close the gender selection modal
+    processImage(selectedFile, selectedGender); // Process the image with the selected gender
   };
 
-  // Handle file upload and receive product suggestions
+  // Handle file upload, showing gender modal afterward
   const handleUpload = (e) => {
     e.preventDefault();
     if (!selectedFile) {
       setMessage("Please select a file first.");
       return;
     }
-    setShowGenderModal(true); // Show the gender selection modal after upload
+    setShowGenderModal(true); // Show gender selection modal
   };
 
-  // Helper function to extract HEX colors from the Cerebras API response
+  // Helper function to extract HEX colors from the API response
   const extractColorsFromString = (colorRecommendation) => {
-    const regex = /#([0-9A-Fa-f]{6})/g;
-    const colorsArray = colorRecommendation.match(regex); // Extracts all HEX color codes
+    const regex = /#([0-9A-Fa-f]{6})/g; // Regular expression to match HEX colors
+    const colorsArray = colorRecommendation.match(regex); // Extract HEX color codes
     return colorsArray || []; // Return an empty array if no colors found
   };
 
-  // Process image after gender selection
+  // Process the uploaded image after gender selection
   const processImage = async (file, selectedGender) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -86,8 +88,8 @@ function App() {
       if (response.data.message && response.data.skinTone) {
         setMessage(response.data.message);
         setSkinTone(response.data.skinTone); // Set skin tone color
-        
-        const colorData = response.data.color_recommendation; // Get color recommendation string
+
+        const colorData = response.data.color_recommendation; // Get color recommendation as a string
         const colorsArray = extractColorsFromString(colorData); // Extract HEX colors from the recommendation
         setColorRecommendation(colorsArray); // Set the colors for the frontend
         fetchOutfitSuggestions(colorsArray[0], selectedGender); // Fetch outfits based on the first color and gender
@@ -110,7 +112,7 @@ function App() {
           Authorization: PEXELS_API_KEY,
         },
         params: {
-          query: `${selectedGender} outfit ${colorRecommendation}`, // Search for outfits based on the color recommendation and gender
+          query: `${selectedGender} outfit ${colorRecommendation}`, // Search for outfits based on color and gender
           per_page: 6, // Limit results to 6 images
         },
       });
@@ -120,17 +122,17 @@ function App() {
         alt: photo.alt,
       }));
 
-      setProducts(images); // Set the images as the product suggestions
+      setProducts(images); // Set the images as product suggestions
     } catch (error) {
       console.error("Error fetching outfit suggestions", error);
       setError("Error fetching outfit suggestions. Please try again.");
     }
   };
 
-  // Handle color click for larger view
+  // Handle color click for larger view in a modal
   const handleColorClick = (color) => {
     setSelectedColor(color);
-    setShowColorModal(true); // Show the modal with the selected color
+    setShowColorModal(true); // Show the color preview modal
   };
 
   // Dummy color meanings for the colors
@@ -142,7 +144,7 @@ function App() {
 
   return (
     <div style={{ backgroundColor: "#edf2f9", minHeight: "100vh", padding: "0rem 0rem" }}>
-      {/* Navbar with Left Logo and Right Links */}
+      {/* Navbar with Logo and Right Links */}
       <Navbar expand="lg" className="gradient-navbar mb-3 navbar-custom">
         <Navbar.Brand href="#home" className="navbar-brand-custom">
           <img
@@ -254,6 +256,25 @@ function App() {
                   <p>No colors available</p>
                 )}
               </div>
+            </Card>
+
+            {/* Colors Meaning Card */}
+            <Card className="card shadow-sm p-4 mb-4 mt-3">
+              <h4 className="mb-3 text-center">Colors Meaning</h4>
+              <ListGroup variant="flush">
+                {colorRecommendation.length > 0 ? (
+                  colorRecommendation.map((color, index) => (
+                    <ListGroup.Item
+                      key={index}
+                      style={{ backgroundColor: color, color: "#fff" }}
+                    >
+                      {colorMeanings[color] || "Color meaning not available."}
+                    </ListGroup.Item>
+                  ))
+                ) : (
+                  <p>No colors available</p>
+                )}
+              </ListGroup>
             </Card>
           </Col>
 
