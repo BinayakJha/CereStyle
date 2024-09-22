@@ -24,10 +24,10 @@ function App() {
   const [products, setProducts] = useState([]);
   const [skinTone, setSkinTone] = useState(null);
   const [colorRecommendation, setColorRecommendation] = useState([]); // Updated to handle multiple colors
+  const [seasonMatched, setSeasonMatched] = useState(""); // New state for season matched
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showGenderModal, setShowGenderModal] = useState(false);
-  const [gender, setGender] = useState(null);
   const [showColorModal, setShowColorModal] = useState(false); // Modal for color preview
   const [selectedColor, setSelectedColor] = useState(""); // For selected color in the pop-up
 
@@ -43,7 +43,6 @@ function App() {
 
   // Handle gender selection from the modal
   const handleGenderSelect = (selectedGender) => {
-    setGender(selectedGender);
     setShowGenderModal(false); // Close the gender selection modal
     processImage(selectedFile, selectedGender); // Process the image with the selected gender
   };
@@ -56,13 +55,6 @@ function App() {
       return;
     }
     setShowGenderModal(true); // Show gender selection modal
-  };
-
-  // Helper function to extract HEX colors from the API response
-  const extractColorsFromString = (colorRecommendation) => {
-    const regex = /#([0-9A-Fa-f]{6})/g; // Regular expression to match HEX colors
-    const colorsArray = colorRecommendation.match(regex); // Extract HEX color codes
-    return colorsArray || []; // Return an empty array if no colors found
   };
 
   // Process the uploaded image after gender selection
@@ -89,10 +81,13 @@ function App() {
         setMessage(response.data.message);
         setSkinTone(response.data.skinTone); // Set skin tone color
 
-        const colorData = response.data.color_recommendation; // Get color recommendation as a string
-        const colorsArray = extractColorsFromString(colorData); // Extract HEX colors from the recommendation
-        setColorRecommendation(colorsArray); // Set the colors for the frontend
-        fetchOutfitSuggestions(colorsArray[0], selectedGender); // Fetch outfits based on the first color and gender
+        const colorData = response.data.color_recommendation; // Get color recommendation array
+        setColorRecommendation(colorData); // Set the colors for the frontend
+
+        // Add season matched to the state
+        setSeasonMatched(response.data.season || "Season not available"); // Set season from the API or provide a fallback
+
+        fetchOutfitSuggestions(colorData[0], selectedGender); // Fetch outfits based on the first color and gender
       } else {
         throw new Error("Unexpected response format from the server");
       }
@@ -236,6 +231,11 @@ function App() {
             {/* Color Theory Card placed directly below the Skin Tone Card */}
             <Card className="card shadow-sm p-4 mb-4 mt-3">
               <h4 className="mb-3 text-center">Color Theory</h4>
+
+              {/* Season Matched Section */}
+              <h5 className="mt-4">Season Matched:</h5>
+              <p>{seasonMatched}</p>
+
               <h5 className="mt-4">Color Bar</h5>
               <div className="d-flex justify-content-between mt-3">
                 {colorRecommendation.length > 0 ? (
