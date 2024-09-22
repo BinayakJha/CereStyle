@@ -1,7 +1,7 @@
 
-# **MatchIt: Fashion with Confidence** ![Logo](./frontend/src/images/logo.png)
+# **CereStyle: Fashion with Confidence** ![Logo](./frontend/src/images/logo.png)
 
-Welcome to **MatchIt**, an AI-powered fashion recommendation system that helps users discover outfits that enhance their natural features. By analyzing hair, skin, and eye color from uploaded photos, MatchIt compares these with reference images and suggests products worn by similar individuals. Whether you're looking for casual or professional attire, MatchIt offers personalized suggestions to help you feel confident in every setting.
+Welcome to **CereStyle**, an AI-powered fashion recommendation system that helps users discover outfits that enhance their natural features. By analyzing hair, skin, and eye color from uploaded photos, CereStyle compares these with reference images and suggests products worn by similar individuals. Whether you're looking for casual or professional attire, CereStyle offers personalized suggestions to help you feel confident in every setting.
 
 ---
 
@@ -19,13 +19,14 @@ Welcome to **MatchIt**, an AI-powered fashion recommendation system that helps u
 5. [How to Use the Project](#how-to-use-the-project)
 6. [Project Directory Structure](#project-directory-structure)
 7. [Key Commands](#key-commands)
-8. [Contributors](#contributors)
+8. [Tech Stack](#tech-stack)
+9. [Contributors](#contributors)
 
 ---
 
 ## **Project Overview**
 
-MatchIt is designed to solve the common struggle of finding clothing that perfectly matches individual features. With the power of color theory and AI, this platform provides fashion suggestions that complement users' natural attributes, helping them feel more confident in their fashion choices. By integrating advanced image processing and real-time product suggestions, MatchIt brings a personalized shopping experience to your fingertips.
+CereStyle is designed to solve the common struggle of finding clothing that perfectly matches individual features. By blending color theory and AI, this platform provides fashion suggestions that complement users' natural attributes, helping them feel more confident. CereStyle brings a personalized shopping experience to your fingertips with advanced image processing and real-time product recommendations.
 
 ---
 
@@ -41,11 +42,11 @@ Before setting up the project, ensure you have the following installed on your s
 
 ## **Backend Setup (FastAPI)**
 
-The backend is built using **FastAPI** and handles tasks like file uploads, image analysis, and product recommendations.
+The backend uses **FastAPI** to handle tasks like file uploads, image analysis, and product recommendations.
 
 ### **Step 1: Create a Virtual Environment (Optional but Recommended)**
 
-Creating a virtual environment ensures that the project dependencies are isolated from the global Python environment.
+Creating a virtual environment ensures that the project dependencies are isolated from your global Python environment.
 
 For **Windows**:
 ```bash
@@ -61,7 +62,7 @@ source venv/bin/activate
 
 ### **Step 2: Install Backend Dependencies**
 
-After activating the virtual environment, install the required packages for the backend:
+After activating the virtual environment, install the necessary packages:
 
 ```bash
 pip install fastapi uvicorn python-multipart Pillow scikit-learn
@@ -76,13 +77,13 @@ cd backend
 uvicorn main:app --reload
 ```
 
-The backend will now be running at `http://127.0.0.1:8000`.
+The backend should now be running at `http://127.0.0.1:8000`.
 
 ---
 
 ## **Frontend Setup (React)**
 
-The frontend is built using **React**, offering an intuitive interface for uploading images and receiving fashion suggestions.
+The frontend is built using **React** and provides an intuitive interface for uploading images and receiving fashion suggestions.
 
 ### **Step 1: Install Frontend Dependencies**
 
@@ -93,37 +94,34 @@ cd react-frontend
 npm install
 ```
 
-This command installs all necessary packages listed in the `package.json` file.
-
 ### **Step 2: Start the React Frontend**
 
-Once dependencies are installed, start the React development server:
+Once the dependencies are installed, start the development server:
 
 ```bash
 npm start
 ```
 
-The React frontend will be accessible at `http://localhost:3000`.
+The frontend should now be running at `http://localhost:3000`.
 
 ---
 
 ## **How to Use the Project**
 
 1. **Open the React App**:
-   - Navigate to `http://localhost:3000` in your browser.
-   
+   - Open your browser and navigate to `http://localhost:3000`.
+
 2. **Upload a Photo**:
-   - Use the file upload form on the main page to upload a photo of yourself.
-   - Click "Upload" to submit the photo for analysis.
+   - Use the upload form on the main page to submit a photo of yourself.
 
 3. **Get Recommendations**:
-   - The backend will analyze the uploaded photo and suggest products based on the closest matching reference image.
+   - The backend analyzes the uploaded photo and suggests products based on the closest matching reference image.
 
 ---
 
 ## **Project Directory Structure**
 
-Here’s an overview of the key folders and files in the project:
+Here's an overview of the project's directory structure:
 
 ```
 project_root/
@@ -131,7 +129,7 @@ project_root/
 ├── backend/                      # Backend code (FastAPI)
 │   ├── __pycache__/              # Python cache files
 │   ├── main.py                   # Main FastAPI app
-│   └── reference_images/         # Folder containing reference images for comparison
+│   └── reference_images/         # Reference images for comparison
 │
 ├── react-frontend/               # Frontend code (React)
 │   ├── node_modules/             # Node.js modules
@@ -139,7 +137,7 @@ project_root/
 │   ├── src/                      # React source code
 │   ├── package.json              # Frontend dependencies list
 │   ├── package-lock.json         # Lockfile for dependencies
-│   └── README.md                 # Frontend README file
+│   └── README.md                 # Frontend README
 │
 └── README.md                     # Main project README
 ```
@@ -174,6 +172,72 @@ project_root/
 
 ---
 
+## **Tech Stack**
+
+CereStyle is built with modern technologies to ensure efficiency, scalability, and an exceptional user experience. Here’s a breakdown of the tools and frameworks used:
+
+### **Frontend**
+
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![JavaScript](https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+
+- **React**: JavaScript library for building user interfaces.
+- **JavaScript**: Primary programming language for client-side scripting.
+- **HTML5**: For structuring web content.
+- **CSS3**: For styling web components.
+
+### **Backend**
+
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![Python](https://img.shields.io/badge/Python-14354C?style=for-the-badge&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
+![Uvicorn](https://img.shields.io/badge/Uvicorn-000000?style=for-the-badge&logo=uvicorn&logoColor=white)
+
+- **FastAPI**: Fast web framework for building APIs in Python.
+- **Python**: Backend processing, including image analysis.
+- **Flask**: Lightweight framework for rapid prototyping.
+- **Uvicorn**: ASGI server for running FastAPI applications.
+
+### **AI/ML Processing**
+
+![Cerebras](https://img.shields.io/badge/Cerebras-AI%20Processing-blue?style=for-the-badge)
+![Pillow](https://img.shields.io/badge/Pillow-Image%20Processing-green?style=for-the-badge)
+![Scikit-learn](https://img.shields.io/badge/Scikit--learn-FA7302?style=for-the-badge&logo=scikit-learn&logoColor=white)
+
+- **Cerebras API**: AI-powered image analysis for skin tone, hair, and eye color detection.
+- **Pillow**: Image processing library.
+- **Scikit-learn**: Machine learning library for color matching and recommendations.
+
+### **Version Control & CI/CD**
+
+![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)
+
+- **Git**: Version control system.
+- **GitHub**: Code hosting platform for collaboration.
+
+### **APIs**
+
+![SerpAPI](https://img.shields.io/badge/SerpAPI-Google%20Search%20API-yellowgreen?style=for-the-badge)
+![Pexels API](https://img.shields.io/badge/Pexels%20API-Image%20Sourcing-green?style=for-the-badge)
+
+- **SerpAPI**: Real-time product recommendations.
+- **Pexels API**: Image sourcing for fashion items.
+
+### **Other Tools**
+
+![VS Code](https://img.shields.io/badge/VS%20Code-0078D4?style=for-the-badge&logo
+
+=visual%20studio%20code&logoColor=white)
+![NPM](https://img.shields.io/badge/NPM-CB3837?style=for-the-badge&logo=npm&logoColor=white)
+
+- **VS Code**: Code editor.
+- **NPM**: Dependency management for frontend development.
+
+---
+
 ## **Contributors**
 
 This project was created by a team of passionate developers:
@@ -182,4 +246,6 @@ This project was created by a team of passionate developers:
 - **[BinayakJha](https://github.com/BinayakJha)**
 - **[sujalshah0444](https://github.com/sujalshah0444)**
 
-We hope you enjoy using **MatchIt** as much as we enjoyed building it!
+We hope you enjoy using **CereStyle** as much as we enjoyed building it!
+```
+
