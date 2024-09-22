@@ -15,6 +15,7 @@ import {
   Nav,
 } from "react-bootstrap";
 import "./App.css";
+import logo from "./images/logo.png"; // Import your logo
 
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -150,16 +151,15 @@ function App() {
     >
       {/* Navbar with Left Logo and Right Links */}
       <Navbar expand="lg" className="gradient-navbar mb-3 navbar-custom">
-        <Navbar.Brand
-          href="#home"
-          className="navbar-brand-custom"
-        ></Navbar.Brand>
+        <Navbar.Brand href="#home" className="navbar-brand-custom">
+          <img
+            src={logo}
+            alt="CereStyle Logo"
+            style={{ width: "150px", height: "auto", padding: "", }} // Set the logo size and padding
+          />
+        </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
-          <Nav>
-            <Nav.Link href="#home"></Nav.Link>
-            <Nav.Link href="#about"></Nav.Link>
-          </Nav>
         </Navbar.Collapse>
       </Navbar>
 
