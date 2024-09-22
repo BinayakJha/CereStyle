@@ -228,10 +228,6 @@ CereStyle is built with modern technologies to ensure efficiency, scalability, a
 
 ### **Other Tools**
 
-![VS Code](https://img.shields.io/badge/VS%20Code-0078D4?style=for-the-badge&logo
-
-=visual%20studio%20code&logoColor=white)
-
 - **VS Code**: Code editor.
 
 
