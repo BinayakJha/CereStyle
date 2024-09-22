@@ -26,7 +26,7 @@ Welcome to **CereStyle**, an AI-powered fashion recommendation system that helps
 
 ## **Project Overview**
 
-CereStyle is designed to solve the common struggle of finding clothing that perfectly matches individual features. By blending color theory and AI, this platform provides fashion suggestions that complement users' natural attributes, helping them feel more confident. CereStyle brings a personalized shopping experience to your fingertips with advanced image processing and real-time product recommendations.
+CereStyle is designed to solve the common struggle of finding clothing that perfectly matches individual features. By blending color theory and AI, this platform provides fashion suggestions that complement users' natural attributes, helping them feel more confident and positively impacting their mental health and confidence. CereStyle brings a personalized shopping experience to your fingertips with advanced image processing and real-time product recommendations.
 
 ---
 
