@@ -6,6 +6,7 @@ import numpy as np
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from cerebras.cloud.sdk import Cerebras
+from serpapi import GoogleSearch
 
 app = FastAPI()
 
@@ -81,8 +82,7 @@ def extract_chin_nose_skin_color(image_path: str):
 
         return avg_color_int
 
-# Use Cerebras API to get season and color palette recommendation
-# Use Cerebras API to get season, color palette, and color meanings
+# Use Cerebras API to get season, color palette, and meanings
 def get_color_recommendation(skin_tone_rgb):
     rgb_string = f"rgb({skin_tone_rgb[0]}, {skin_tone_rgb[1]}, {skin_tone_rgb[2]})"
 
@@ -100,7 +100,6 @@ def get_color_recommendation(skin_tone_rgb):
     )
     return chat_completion.choices[0].message.content
 
-
 # Function to parse season, colors, and their meanings from Cerebras response
 def parse_color_recommendation(response_text):
     try:
@@ -116,13 +115,27 @@ def parse_color_recommendation(response_text):
     except Exception as e:
         raise ValueError("Error parsing the color recommendation response: " + str(e))
 
+# SerpAPI search function for shopping results
+def search_shopping_results(query: str):
+    params = {
+        "engine": "google_shopping",
+        "q": query,
+        "api_key": "7f8f163db53a8340e52177cc269a42b1d0df59e5efc96b3e5d06223ed01d54af"  # Add your SerpAPI key here
+    }
+    search = GoogleSearch(params)
+    results = search.get_dict()
+
+    # Extract shopping results from the API response
+    if "shopping_results" in results:
+        return results["shopping_results"]
+    else:
+        raise HTTPException(status_code=404, detail="No shopping results found")
 
 # API endpoint for uploading a photo and suggesting outfits
 @app.post("/upload")
 async def upload_and_suggest(file: UploadFile = File(...)):
     # Save the uploaded file
     file_path = save_uploaded_file(file, UPLOAD_FOLDER)
-
     try:
         # Extract skin tone color from chin and nose using Mediapipe
         skin_tone_color = extract_chin_nose_skin_color(file_path)
@@ -137,12 +150,16 @@ async def upload_and_suggest(file: UploadFile = File(...)):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+    # Fetch shopping options based on the first color
+    shopping_options = search_shopping_results(f"{season} {colors[0]} dress for men")
+
     return {
         "message": "Color recommendation generated",
         "color_recommendation": colors,
         "season": season,
         "meanings": meanings,  # Add meanings to the response
-        "skinTone": f"rgb({skin_tone_color[0]}, {skin_tone_color[1]}, {skin_tone_color[2]})"
+        "skinTone": f"rgb({skin_tone_color[0]}, {skin_tone_color[1]}, {skin_tone_color[2]})",
+        "shopping_options": shopping_options  # Return the shopping options
     }
 
 if __name__ == "__main__":
