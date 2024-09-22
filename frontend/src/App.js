@@ -13,7 +13,6 @@ import {
   Modal,
   Navbar,
   Nav, // Added Nav for the Navbar links
-  Nav, // Added Nav for the Navbar links
 } from "react-bootstrap";
 import "./App.css";
 import logo from "./images/logo.png"; // Import your logo
@@ -159,10 +158,6 @@ function App() {
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
-          <Nav>
-            {/* Navbar link to trigger the Color Theory modal */}
-            <Nav.Link onClick={() => setShowColorTheoryModal(true)}>About Color Theory</Nav.Link>
-          </Nav>
           <Nav>
             {/* Navbar link to trigger the Color Theory modal */}
             <Nav.Link onClick={() => setShowColorTheoryModal(true)}>About Color Theory</Nav.Link>
