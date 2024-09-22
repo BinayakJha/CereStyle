@@ -1,7 +1,7 @@
 
 ---
 
-# **Fashion Recommendation System**
+# **MatchIt: Fashion with confidence**
 
 This project is a fashion recommendation system where users upload photos, and the system automatically compares the hair, skin, and eye color of the uploaded photo with pre-stored reference photos. Based on the closest match, the system suggests products that were used by the person in the reference photo.
 

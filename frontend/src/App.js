@@ -12,6 +12,7 @@ import {
   Alert,
   Modal,
   Navbar,
+  Nav, // Added Nav for the Navbar links
 } from "react-bootstrap";
 import "./App.css";
 import logo from "./images/logo.png"; // Import your logo
@@ -24,12 +25,15 @@ function App() {
   const [products, setProducts] = useState([]);
   const [skinTone, setSkinTone] = useState(null);
   const [colorRecommendation, setColorRecommendation] = useState([]); // Updated to handle multiple colors
+  const [seasonMatched, setSeasonMatched] = useState(""); // New state for season matched
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showGenderModal, setShowGenderModal] = useState(false);
-  const [gender, setGender] = useState(null);
   const [showColorModal, setShowColorModal] = useState(false); // Modal for color preview
   const [selectedColor, setSelectedColor] = useState(""); // For selected color in the pop-up
+  const [showColorTheoryModal, setShowColorTheoryModal] = useState(false); // Modal for Color Theory
+  const [meanings, setMeanings] = useState([]); // New state to store color meanings
+
 
   const PEXELS_API_KEY =
     "pGWgqahVrcprpx2XmPB4K8lrs9onLLjwBYRdusShqrglMavLjNpYtEIH";
@@ -43,7 +47,6 @@ function App() {
 
   // Handle gender selection from the modal
   const handleGenderSelect = (selectedGender) => {
-    setGender(selectedGender);
     setShowGenderModal(false); // Close the gender selection modal
     processImage(selectedFile, selectedGender); // Process the image with the selected gender
   };
@@ -58,22 +61,15 @@ function App() {
     setShowGenderModal(true); // Show gender selection modal
   };
 
-  // Helper function to extract HEX colors from the API response
-  const extractColorsFromString = (colorRecommendation) => {
-    const regex = /#([0-9A-Fa-f]{6})/g; // Regular expression to match HEX colors
-    const colorsArray = colorRecommendation.match(regex); // Extract HEX color codes
-    return colorsArray || []; // Return an empty array if no colors found
-  };
-
   // Process the uploaded image after gender selection
   const processImage = async (file, selectedGender) => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("gender", selectedGender); // Send gender as part of the request
-
+  
     setLoading(true); // Show loading spinner
     setError(""); // Reset error state
-
+  
     try {
       const response = await axios.post(
         "http://127.0.0.1:8000/upload",
@@ -84,15 +80,21 @@ function App() {
           },
         }
       );
-
+  
       if (response.data.message && response.data.skinTone) {
         setMessage(response.data.message);
         setSkinTone(response.data.skinTone); // Set skin tone color
-
-        const colorData = response.data.color_recommendation; // Get color recommendation as a string
-        const colorsArray = extractColorsFromString(colorData); // Extract HEX colors from the recommendation
-        setColorRecommendation(colorsArray); // Set the colors for the frontend
-        fetchOutfitSuggestions(colorsArray[0], selectedGender); // Fetch outfits based on the first color and gender
+  
+        const colorData = response.data.color_recommendation; // Get color recommendation array
+        setColorRecommendation(colorData); // Set the colors for the frontend
+  
+        const meaningData = response.data.meanings; // Get the color meanings from the response
+        setMeanings(meaningData); // Set the meanings for the frontend
+  
+        // Add season matched to the state
+        setSeasonMatched(response.data.season || "Season not available"); // Set season from the API or provide a fallback
+  
+        fetchOutfitSuggestions(colorData[0], selectedGender); // Fetch outfits based on the first color and gender
       } else {
         throw new Error("Unexpected response format from the server");
       }
@@ -103,6 +105,7 @@ function App() {
       setLoading(false); // Hide loading spinner
     }
   };
+  
 
   // Fetch outfit suggestions using Pexels API
   const fetchOutfitSuggestions = async (colorRecommendation, selectedGender) => {
@@ -155,6 +158,10 @@ function App() {
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
+          <Nav>
+            {/* Navbar link to trigger the Color Theory modal */}
+            <Nav.Link onClick={() => setShowColorTheoryModal(true)}>About Color Theory</Nav.Link>
+          </Nav>
         </Navbar.Collapse>
       </Navbar>
 
@@ -236,6 +243,11 @@ function App() {
             {/* Color Theory Card placed directly below the Skin Tone Card */}
             <Card className="card shadow-sm p-4 mb-4 mt-3">
               <h4 className="mb-3 text-center">Color Theory</h4>
+
+              {/* Season Matched Section */}
+              <h5 className="mt-4">Season Matched:</h5>
+              <p>{seasonMatched}</p>
+
               <h5 className="mt-4">Color Bar</h5>
               <div className="d-flex justify-content-between mt-3">
                 {colorRecommendation.length > 0 ? (
@@ -262,13 +274,13 @@ function App() {
             <Card className="card shadow-sm p-4 mb-4 mt-3">
               <h4 className="mb-3 text-center">Colors Meaning</h4>
               <ListGroup variant="flush">
-                {colorRecommendation.length > 0 ? (
+                {colorRecommendation.length > 0 && meanings.length > 0 ? (
                   colorRecommendation.map((color, index) => (
                     <ListGroup.Item
                       key={index}
                       style={{ backgroundColor: color, color: "#fff" }}
                     >
-                      {colorMeanings[color] || "Color meaning not available."}
+                      {meanings[index] || "Color meaning not available."}
                     </ListGroup.Item>
                   ))
                 ) : (
@@ -276,6 +288,7 @@ function App() {
                 )}
               </ListGroup>
             </Card>
+
           </Col>
 
           {/* Side Column for Product Recommendations */}
@@ -340,6 +353,49 @@ function App() {
             }}
           ></div>
         </Modal.Body>
+      </Modal>
+
+       {/* Color Theory Modal */}
+       <Modal
+        show={showColorTheoryModal}
+        onHide={() => setShowColorTheoryModal(false)}
+        centered
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>About Color Theory</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <h4>What is Color Theory?</h4>
+          <p>
+            Color theory is a body of practical guidance to color mixing and
+            the visual effects of a specific color combination. Color theory
+            principles first appeared in the writings of Leone Battista Alberti
+            (c. 1435) and the notebooks of Leonardo da Vinci (c. 1490). A more
+            formalized representation of color theory concepts can be found in
+            Isaac Newton's color wheel (1704), which maps the relationships
+            between colors in a circle.
+          </p>
+          <p>
+            Understanding color theory helps you pair colors more effectively,
+            ensuring that your outfits or designs stand out while maintaining
+            harmony and visual appeal.
+          </p>
+          <h5>Primary Colors:</h5>
+          <p>Red, Blue, Yellow – these are the base colors that can be mixed to form any other color.</p>
+          <h5>Secondary Colors:</h5>
+          <p>Orange, Green, Purple – formed by mixing two primary colors.</p>
+          <h5>Complementary Colors:</h5>
+          <p>
+            Colors that sit opposite each other on the color wheel. They create
+            high contrast and vibrant looks.
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowColorTheoryModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
       </Modal>
     </div>
   );

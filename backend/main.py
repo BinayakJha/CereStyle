@@ -19,7 +19,7 @@ app.add_middleware(
 
 # Initialize Cerebras API client
 client = Cerebras(
-    api_key="csk-6f2yk2ytvkexfwnnchrxr6vyd8j2jmcetykmwd92xe3dcde9",  # Set in environment
+    api_key="csk-6f2yk2ytvkexfwnnchrxr6vyd8j2jmcetykmwd92xe3dcde9",
 )
 
 # Paths
@@ -82,10 +82,14 @@ def extract_chin_nose_skin_color(image_path: str):
         return avg_color_int
 
 # Use Cerebras API to get season and color palette recommendation
+# Use Cerebras API to get season, color palette, and color meanings
 def get_color_recommendation(skin_tone_rgb):
     rgb_string = f"rgb({skin_tone_rgb[0]}, {skin_tone_rgb[1]}, {skin_tone_rgb[2]})"
 
-    prompt = f"dont write code or any other explanation, just output the color recommendation. Given the RGB values of a person's skin tone ({rgb_string}), generate a season color (one word: autumn, summer, winter, spring) and three corresponding color codes (HEX) that best match their skin tone based on color theory. Output format should strictly only be: 'Season: <season> Colors (at least 6): <color1>, <color2>, <color3>, <color4>, <color5>, <color6>'."
+    prompt = f""" just write the Season color palette and the meaning of the color nothing else
+    Given the RGB values of a person's skin tone ({rgb_string}), generate a season color (one word: autumn, summer, winter, spring), six corresponding color codes (HEX), and their respective meanings based on color theory. 
+    Output format should strictly only be: 'Season: <season> Colors: <color1>, <color2>, <color3>, <color4>, <color5>, <color6> Meanings: <meaning1>, <meaning2>, <meaning3>, <meaning4>, <meaning5>, <meaning6>'.
+    """
 
     chat_completion = client.chat.completions.create(
         messages=[{
@@ -95,6 +99,23 @@ def get_color_recommendation(skin_tone_rgb):
         model="llama3.1-8b"
     )
     return chat_completion.choices[0].message.content
+
+
+# Function to parse season, colors, and their meanings from Cerebras response
+def parse_color_recommendation(response_text):
+    try:
+        # Split response to get the season, colors, and meanings
+        season_part, colors_part = response_text.split('Colors: ')
+        colors_part, meanings_part = colors_part.split('Meanings: ')
+
+        season = season_part.replace('Season: ', '').strip()
+        colors = [color.strip() for color in colors_part.split(',')]
+        meanings = [meaning.strip() for meaning in meanings_part.split(',')]
+        
+        return season, colors, meanings
+    except Exception as e:
+        raise ValueError("Error parsing the color recommendation response: " + str(e))
+
 
 # API endpoint for uploading a photo and suggesting outfits
 @app.post("/upload")
@@ -108,12 +129,19 @@ async def upload_and_suggest(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    # Use Cerebras API to get season and color palette
+    # Use Cerebras API to get season, color palette, and meanings
     color_recommendation = get_color_recommendation(skin_tone_color)
+
+    try:
+        season, colors, meanings = parse_color_recommendation(color_recommendation)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
     return {
         "message": "Color recommendation generated",
-        "color_recommendation": color_recommendation,
+        "color_recommendation": colors,
+        "season": season,
+        "meanings": meanings,  # Add meanings to the response
         "skinTone": f"rgb({skin_tone_color[0]}, {skin_tone_color[1]}, {skin_tone_color[2]})"
     }
 
