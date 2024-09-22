@@ -1,11 +1,11 @@
+import os
+import cv2
+import shutil
+import mediapipe as mp
+import numpy as np
+from sklearn.cluster import KMeans
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import os
-import shutil
-import numpy as np
-from PIL import Image
-import cv2
-from sklearn.cluster import KMeans
 from cerebras.cloud.sdk import Cerebras
 
 app = FastAPI()
@@ -20,25 +20,16 @@ app.add_middleware(
 
 # Initialize Cerebras API client
 client = Cerebras(
-    api_key="csk-6f2yk2ytvkexfwnnchrxr6vyd8j2jmcetykmwd92xe3dcde9",  # Make sure to set this in your environment
+    api_key="csk-6f2yk2ytvkexfwnnchrxr6vyd8j2jmcetykmwd92xe3dcde9",  # Set in environment
 )
 
-# Allow CORS for React frontend
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Folder paths for uploaded and reference images
+# Paths
 UPLOAD_FOLDER = "uploads/"
-REFERENCE_FOLDER = "reference_images/"
-
-# Ensure the directories exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(REFERENCE_FOLDER, exist_ok=True)
+
+# Initialize Mediapipe Face Detection and Landmark Modules
+mp_face_detection = mp.solutions.face_detection
+mp_drawing = mp.solutions.drawing_utils
 
 # Helper function to save the uploaded file
 def save_uploaded_file(uploaded_file: UploadFile, folder: str):
@@ -47,23 +38,39 @@ def save_uploaded_file(uploaded_file: UploadFile, folder: str):
         shutil.copyfileobj(uploaded_file.file, buffer)
     return file_path
 
-# Extract dominant colors from face using K-Means Clustering
-def extract_colors_from_face(image_path: str, num_clusters=5):
-    image = Image.open(image_path).convert('RGB')
-    image_np = np.array(image)
+# Extract skin color using face landmarks from Mediapipe
+def extract_skin_color_mediapipe(image_path: str, num_clusters=5):
+    image = cv2.imread(image_path)
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    # Resize image for faster computation
-    resized_image = cv2.resize(image_np, (100, 100))
-    pixels = resized_image.reshape(-1, 3)
+    # Initialize Mediapipe Face Detection
+    with mp_face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.5) as face_detection:
+        results = face_detection.process(image_rgb)
 
-    # Apply K-Means clustering
-    kmeans = KMeans(n_clusters=num_clusters)
-    kmeans.fit(pixels)
-    colors = kmeans.cluster_centers_.astype(int)
+        if not results.detections:
+            raise HTTPException(status_code=400, detail="No face detected")
 
-    return colors
+        # Take the first detected face
+        detection = results.detections[0]
 
-# Send the RGB skin tone to Cerebras API and get color recommendations
+        # Get the bounding box of the face
+        bboxC = detection.location_data.relative_bounding_box
+        ih, iw, _ = image.shape
+        (x, y, w, h) = int(bboxC.xmin * iw), int(bboxC.ymin * ih), int(bboxC.width * iw), int(bboxC.height * ih)
+
+        # Extract the face region of interest (ROI)
+        face_roi = image_rgb[y:y+h, x:x+w]
+
+        # Reshape the face ROI to a 2D array of pixels (for K-Means clustering)
+        face_pixels = face_roi.reshape(-1, 3)
+
+        # Apply K-Means clustering to find the dominant skin color
+        kmeans = KMeans(n_clusters=num_clusters)
+        kmeans.fit(face_pixels)
+        dominant_color = kmeans.cluster_centers_.astype(int)
+        return dominant_color[0]
+
+# Use Cerebras API to get season and color palette recommendation
 def get_color_recommendation(skin_tone_rgb):
     rgb_string = f"rgb({skin_tone_rgb[0]}, {skin_tone_rgb[1]}, {skin_tone_rgb[2]})"
     
@@ -76,7 +83,6 @@ def get_color_recommendation(skin_tone_rgb):
         }],
         model="llama3.1-8b"
     )
-    print(chat_completion)
     return chat_completion.choices[0].message.content
 
 # API endpoint for uploading a photo and suggesting outfits
@@ -84,10 +90,12 @@ def get_color_recommendation(skin_tone_rgb):
 async def upload_and_suggest(file: UploadFile = File(...)):
     # Save the uploaded file
     file_path = save_uploaded_file(file, UPLOAD_FOLDER)
-    
-    # Extract dominant skin tone color
-    face_colors = extract_colors_from_face(file_path)
-    skin_tone_color = face_colors[np.argmax(face_colors.sum(axis=1))]
+
+    try:
+        # Extract dominant skin tone color using Mediapipe
+        skin_tone_color = extract_skin_color_mediapipe(file_path)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
     # Use Cerebras API to get season and color palette
     color_recommendation = get_color_recommendation(skin_tone_color)
