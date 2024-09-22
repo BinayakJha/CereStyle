@@ -9,11 +9,12 @@ function App() {
   const [message, setMessage] = useState('');
   const [products, setProducts] = useState([]);
   const [skinTone, setSkinTone] = useState(null);
+  const [colorRecommendation, setColorRecommendation] = useState(''); // Color Recommendation
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showGenderModal, setShowGenderModal] = useState(false);
   const [gender, setGender] = useState(null);
-  const [showColorModal, setShowColorModal] = useState(false); // For color pop-up
+  const [showColorModal, setShowColorModal] = useState(false); // For color pop-up modal
   const [selectedColor, setSelectedColor] = useState(''); // For selected color in pop-up
 
   const [seasons] = useState(['Summer', 'Winter']); // Placeholder seasons
@@ -64,7 +65,8 @@ function App() {
       if (response.data.message && response.data.skinTone) {
         setMessage(response.data.message);
         setSkinTone(response.data.skinTone); // Set skin tone color
-        fetchOutfitSuggestions(response.data.skinTone, selectedGender); // Fetch outfits based on the skin tone and gender
+        setColorRecommendation(response.data.color_recommendation); // Set the color recommendation
+        fetchOutfitSuggestions(response.data.color_recommendation, selectedGender); // Fetch outfits based on the color recommendation and gender
       } else {
         throw new Error('Unexpected response format from the server');
       }
@@ -77,14 +79,14 @@ function App() {
   };
 
   // Fetch outfit suggestions using Pexels API
-  const fetchOutfitSuggestions = async (color, selectedGender) => {
+  const fetchOutfitSuggestions = async (colorRecommendation, selectedGender) => {
     try {
       const response = await axios.get('https://api.pexels.com/v1/search', {
         headers: {
           Authorization: PEXELS_API_KEY,
         },
         params: {
-          query: `${selectedGender} outfit ${color}`, // Search for outfits based on the detected skin tone and selected gender
+          query: `${selectedGender} outfit ${colorRecommendation}`, // Search for outfits based on the color recommendation and gender
           per_page: 6, // Limit results to 6 images
         },
       });
